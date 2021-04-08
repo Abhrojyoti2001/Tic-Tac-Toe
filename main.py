@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import messagebox
+import random
 
 
 class Game:
@@ -8,26 +9,32 @@ class Game:
     D2 = {'Player_1': {'Name': "Player 1", 'Symbol': "X", 'Colour': "red", 'Total_win': 0}, 'Player_2': {'Name': "Player 2", 'Symbol': "O", 'Colour': "blue",  'Total_win': 0}}
     D3 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
     D4 = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
+    mode = None
+    turn = None
+    path = 0
     p_id = None
     draw = 0
     highlight_text = None
     background_colour_code = "#3498db"
+    back_btn = 1
 
     def __init__(self):
         self.load_gui_window(self.load_1st_window)
 
-    def load_gui_window(self, gui_type, bgc=background_colour_code, top=1, btn=None):
-
+    def load_gui_window(self, gui_type, bgc=None, top=1, btn=None):
         self.root = Tk()
 
         self.root.title("Tic Tac Toe")
         self.root.minsize(420, 500)
         self.root.maxsize(420, 500)
 
-        self.root.configure(background=bgc)
+        if bgc == None:
+            self.root.configure(background=self.background_colour_code)
+        else:
+            self.root.configure(background=bgc)
         # load gui window
         if gui_type == self.gaming_window:
-            self.gaming_window(bgc, top=top)
+            self.gaming_window(top=top)
         elif gui_type == self.symbol_change_gui:
             self.symbol_change_gui(btn=btn)
         elif gui_type == self.symbol_colour_change_gui:
@@ -36,232 +43,213 @@ class Game:
             gui_type()
         self.root.mainloop()
 
-    def load_1st_window(self):
-        if self.background_colour_code == "#fff":
-            fc = "black"
+    def load_new_gui(self, new_gui, top=1, btn=None):
+        self.root.destroy()
+        if new_gui == self.background_colour_change:
+            self.back_btn = 2
+            self.load_gui_window(new_gui, bgc="#fff", top=top)
+        elif new_gui == self.symbol_change_gui:
+            self.back_btn = 3
+            self.load_gui_window(new_gui, bgc="#fff", btn=btn)
+        elif new_gui == self.symbol_colour_change_gui:
+            self.back_btn = 4
+            self.load_gui_window(new_gui, bgc="#fff", btn=btn)
         else:
-            fc = "#fff"
-        if self.background_colour_code == self.D2['Player_1']['Colour'] or self.background_colour_code == self.D2['Player_2']['Colour']:
-            tc = "#fff"
+            self.load_gui_window(new_gui, top=top)
+
+    def refresh_window(self, bgc, new_window, kyw=None):
+        self.D0 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
+        self.D1 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
+        self.D3 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
+        self.D4 = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
+        self.path = 0
+        self.p_id = None
+        self.draw = 0
+        if kyw == "SNG":
+            self.D2['Player_1']['Total_win'] = 0
+            self.D2['Player_2']['Total_win'] = 0
+            self.load_new_gui(new_window)
+        elif kyw == "RTG":
+            self.gaming_mode(1)
+        elif kyw == "TRUE":
+            self.path = 0
+            self.gaming_mode(1)
         else:
-            tc = self.background_colour_code
-        self.label0 = Label(self.root, text="Tic Tac Toe", bg=self.background_colour_code, fg=fc, font=("Times", 32, "bold")).pack(pady=(20, 10))
-        self.label1 = Label(self.root, text="First Player", bg=self.background_colour_code, fg=fc, font=("Times", 20, "italic")).pack(pady=(10, 2))
+            self.mode = None
+            self.turn = None
+            self.back_btn = 1
+            self.D2 = {'Player_1': {'Name': "Player 1", 'Symbol': "X", 'Colour': "red", 'Total_win': 0}, 'Player_2': {'Name': "Player 2", 'Symbol': "O", 'Colour': "blue", 'Total_win': 0}}
+            self.load_new_gui(new_window)
 
-        v1 = StringVar()
-        v1.set(self.D2['Player_1']['Name'])
-        self.player_1 = Entry(self.root, textvariable=v1)
-        self.player_1.pack(pady=(2, 10), ipady=7, ipadx=80)
+    def header_menu1(self):
+        menu = Menu(self.root)
+        self.root.configure(menu=menu)
+        filemenu = Menu(menu)
+        menu.add_cascade(label="Home", menu=filemenu)
+        filemenu.add_command(label="Restart This Game", command=lambda: self.refresh_window(self.background_colour_code, self.gaming_window, "RTG"))
+        filemenu.add_command(label="Start a New Game", command=lambda: self.refresh_window(self.background_colour_code, self.gaming_window, "SNG"))
+        filemenu.add_command(label="Exit and Back to First Page", command=lambda: self.refresh_window(self.background_colour_code, self.load_1st_window, "EBFP"))
 
-        self.frame1 = Frame(self.root, bg="#3498db")
-        self.frame1.pack()
-        self.label2 = Label(self.frame1, text=self.D2['Player_1']['Symbol'], bg=tc, fg=self.D2['Player_1']['Colour'],  font=("Arial", 20)).pack(side=LEFT)
-        self.sim1 = Button(self.frame1, text="Change symbol & colour", bg="#fff", fg="#FF5357", font=("Times", 14), command=lambda: self.load_new_gui(new_gui=self.symbol_change_gui, btn=1)).pack(side=LEFT)
+    def header_menu2(self):
+        menu = Menu(self.root)
+        self.root.configure(menu=menu)
+        filemenu = Menu(menu)
+        menu.add_command(label="Back", command=lambda: self.back_button_task())
 
-        self.label3 = Label(self.root, text="Second Player", bg=self.background_colour_code, fg=fc, font=("Times", 20, "italic")).pack(pady=(20, 2))
+    def header_menu3(self):
+        menu = Menu(self.root)
+        self.root.configure(menu=menu)
+        filemenu = Menu(menu)
+        menu.add_command(label="Back", command=lambda: self.back_button_task())
+        menu.add_command(label="Change Background Colour", command=lambda: self.load_new_gui(self.background_colour_change))
 
-        v2 = StringVar()
-        v2.set(self.D2['Player_2']['Name'])
-        self.player_2 = Entry(self.root, textvariable=v2)
-        self.player_2.pack(pady=(2, 10), ipady=7, ipadx=80)
-
-        self.frame2 = Frame(self.root, bg="#3498db")
-        self.frame2.pack()
-        self.label4 = Label(self.frame2, text=self.D2['Player_2']['Symbol'], fg=self.D2['Player_2']['Colour'], bg=tc, font=("Arial", 20)).pack(side=LEFT)
-        self.sim2 = Button(self.frame2, text="Change symbol & colour", bg="#fff", fg="#FF5357", font=("Times", 14), command=lambda: self.load_new_gui(new_gui=self.symbol_change_gui, btn=2)).pack(side=LEFT)
-
-        self.start_btn = Button(self.root, text="Start Game", bg="#fff", fg="#FF5357", font=("Times", 20, "bold"), command=lambda: self.player_details()).pack(pady=(10, 10))
+    def back_button_task(self):
+        if self.back_btn == 2:
+            self.load_new_gui(self.gaming_window)
+        elif self.back_btn == 3:
+            self.D2['Player_1']['Symbol'] = "X"
+            self.D2['Player_2']['Symbol'] = "O"
+            self.load_new_gui(self.load_2nd_window)
+        elif self.back_btn == 4:
+            self.D2['Player_1']['Colour'] = "red"
+            self.D2['Player_2']['Colour'] = "blue"
+            self.load_new_gui(self.symbol_change_gui)
+        else:
+            self.refresh_window(self.background_colour_code, self.load_1st_window)
 
     def player_details(self):
         self.D2['Player_1']['Name'] = self.player_1.get()
         self.D2['Player_2']['Name'] = self.player_2.get()
         if self.D2['Player_1']['Symbol'] == self.D2['Player_2']['Symbol'] and self.D2['Player_1']['Colour'] == self.D2['Player_1']['Colour']:
             messagebox.showerror("Error!", "You cant use same symbol & colour")
-            self.load_new_gui(self.load_1st_window)
+            self.load_new_gui(self.load_2nd_window)
         else:
             data = messagebox.askquestion("Important Notice", "You cannot change name,symbol & colour in middle of game. Are you want to continue?")  # yes or no
             if data == 'yes':
-                self.load_new_gui(self.gaming_window, self.background_colour_code)
+                self.gaming_mode(1)
             else:
-                self.load_new_gui(self.load_1st_window)
+                self.load_new_gui(self.load_2nd_window)
 
-    def load_new_gui(self, new_gui, bgc=None, top=1, btn=None):
-        self.root.destroy()
-        if new_gui == self.background_colour_change:
-            self.load_gui_window(new_gui, bgc="#fff", top=top)
-        elif new_gui == self.symbol_change_gui:
-            self.load_gui_window(new_gui, bgc="#fff", btn=btn)
-        elif new_gui == self.symbol_colour_change_gui:
-            self.load_gui_window(new_gui, bgc="#fff", btn=btn)
-        else:
-            if bgc == None:
-                self.load_gui_window(new_gui, top=top)
+    def gaming_mode(self, top):
+        if self.mode == "Single Player":
+            if self.path == 0: # this is for first time
+                if self.turn == "First Turn":
+                    self.path = 11
+                    self.load_new_gui(self.gaming_window, top)
+                else:
+                    self.path = 12
+                    self.turn_of_cpu(top)
+            elif self.path == 11:
+                self.path = 12
+                self.turn_of_cpu(top)
+            elif self.path == 12:
+                self.path = 11
+                self.load_new_gui(self.gaming_window, top)
             else:
-                self.load_gui_window(new_gui, bgc, top)
-
-    def header_menu1(self, bgc):
-        menu = Menu(self.root)
-        self.root.configure(menu=menu)
-        filemenu = Menu(menu)
-        menu.add_cascade(label="Home", menu=filemenu)
-        filemenu.add_command(label="New Game", command=lambda: self.refresh_gaming_window(self.background_colour_code, self.gaming_window, "NG"))
-        filemenu.add_command(label="Change Background Colour", command=lambda: self.load_new_gui(self.background_colour_change))
-        filemenu.add_command(label="Exit from Game", command=lambda: self.refresh_gaming_window(bgc, self.load_1st_window, "EG"))
-
-    def refresh_gaming_window(self, bgc, new_window, btn=None):
-        self.D0 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
-        self.D1 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
-        if btn == "NG":
-            self.D2['Player_1']['Total_win'] = 0
-            self.D2['Player_2']['Total_win'] = 0
-        elif btn == "True":
-            k = 1
+                b = self.path
+                self.path = 12
+                if top == 1:
+                    top = 2
+                else:
+                    top = 1
+                self.gaming_rule(top, b)
         else:
-            self.D2 = {'Player_1': {'Name': "Player 1", 'Symbol': "X", 'Colour': "red", 'Total_win': 0}, 'Player_2': {'Name': "Player 2", 'Symbol': "O", 'Colour': "blue", 'Total_win': 0}}
-        self.D3 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
-        self.D4 = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0, '9': 0}
-        self.p_id = None
-        self.draw = 0
-        self.load_new_gui(new_window, bgc)
+            self.load_new_gui(self.gaming_window, top)
 
-    def header_menu2(self):
-        menu = Menu(self.root)
-        self.root.configure(menu=menu)
-        filemenu = Menu(menu)
-        menu.add_command(label="Back", command=lambda: self.load_new_gui(self.gaming_window))
+    def intelligence_of_cup(self, top):
+        if self.D3['1'] == self.D3['2'] and self.D3['2'] != None and self.D3['3'] == None:
+            self.path = 3
+            self.gaming_mode(top)
+        elif self.D3['2'] == self.D3['3'] and self.D3['3'] != None and self.D3['1'] == None:
+            self.path = 1
+            self.gaming_mode(top)
+        elif self.D3['1'] == self.D3['3'] and self.D3['3'] != None and self.D3['2'] == None:
+            self.path = 2
+            self.gaming_mode(top)
 
-    def header_menu3(self):
-        menu = Menu(self.root)
-        self.root.configure(menu=menu)
-        filemenu = Menu(menu)
-        menu.add_command(label="Back", command=lambda: self.load_new_gui(self.load_1st_window))
+        elif self.D3['1'] == self.D3['4'] and self.D3['4'] != None and self.D3['7'] == None:
+            self.path = 7
+            self.gaming_mode(top)
+        elif self.D3['4'] == self.D3['7'] and self.D3['7'] != None and self.D3['1'] == None:
+            self.path = 1
+            self.gaming_mode(top)
+        elif self.D3['1'] == self.D3['7'] and self.D3['7'] != None and self.D3['4'] == None:
+            self.path = 4
+            self.gaming_mode(top)
 
-    def header_menu4(self):
-        menu = Menu(self.root)
-        self.root.configure(menu=menu)
-        filemenu = Menu(menu)
-        menu.add_command(label="Back", command=lambda: self.load_new_gui(self.symbol_change_gui))
+        elif self.D3['1'] == self.D3['5'] and self.D3['5'] != None and self.D3['9'] == None:
+            self.path = 9
+            self.gaming_mode(top)
+        elif self.D3['5'] == self.D3['9'] and self.D3['9'] != None and self.D3['1'] == None:
+            self.path = 1
+            self.gaming_mode(top)
+        elif self.D3['1'] == self.D3['9'] and self.D3['9'] != None and self.D3['5'] == None:
+            self.path = 5
+            self.gaming_mode(top)
 
-    def colour_code(self, cc=None):
-        self.background_colour_code = cc
+        elif self.D3['2'] == self.D3['5'] and self.D3['5'] != None and self.D3['8'] == None:
+            self.path = 8
+            self.gaming_mode(top)
+        elif self.D3['5'] == self.D3['8'] and self.D3['8'] != None and self.D3['2'] == None:
+            self.path = 2
+            self.gaming_mode(top)
+        elif self.D3['2'] == self.D3['8'] and self.D3['8'] != None and self.D3['5'] == None:
+            self.path = 5
+            self.gaming_mode(top)
 
-    def background_colour_change(self):
-        self.header_menu2()
+        elif self.D3['3'] == self.D3['5'] and self.D3['5'] != None and self.D3['7'] == None:
+            self.path = 7
+            self.gaming_mode(top)
+        elif self.D3['5'] == self.D3['7'] and self.D3['7'] != None and self.D3['3'] == None:
+            self.path = 3
+            self.gaming_mode(top)
+        elif self.D3['3'] == self.D3['7'] and self.D3['7'] != None and self.D3['5'] == None:
+            self.path = 5
+            self.gaming_mode(top)
 
-        self.label0 = Label(self.root, text="Press the  Colour which you want", font=("Times", 20, "bold")).pack(pady=(20, 10))
+        elif self.D3['3'] == self.D3['6'] and self.D3['6'] != None and self.D3['9'] == None:
+            self.path = 9
+            self.gaming_mode(top)
+        elif self.D3['6'] == self.D3['9'] and self.D3['9'] != None and self.D3['3'] == None:
+            self.path = 3
+            self.gaming_mode(top)
+        elif self.D3['3'] == self.D3['9'] and self.D3['9'] != None and self.D3['6'] == None:
+            self.path = 6
+            self.gaming_mode(top)
 
-        self.frame1 = Frame(self.root)
-        self.frame1.pack()
-        b1 = Button(self.frame1, text="\t", bg="#3498db", font=("Times", 20), command=lambda: self.colour_code("#3498db")).pack(side=LEFT)
-        b2 = Button(self.frame1, text="\t", bg="red", font=("Times", 20), command=lambda: self.colour_code("red")).pack(side=LEFT)
-        b3 = Button(self.frame1, text="\t", bg="blue", font=("Times", 20), command=lambda: self.colour_code("blue")).pack(side=LEFT)
+        elif self.D3['4'] == self.D3['5'] and self.D3['5'] != None and self.D3['6'] == None:
+            self.path = 6
+            self.gaming_mode(top)
+        elif self.D3['5'] == self.D3['6'] and self.D3['6'] != None and self.D3['4'] == None:
+            self.path = 4
+            self.gaming_mode(top)
+        elif self.D3['4'] == self.D3['6'] and self.D3['6'] != None and self.D3['5'] == None:
+            self.path = 5
+            self.gaming_mode(top)
 
-        self.frame2 = Frame(self.root)
-        self.frame2.pack()
-        b4 = Button(self.frame2, text="\t", bg="#fff", font=("Times", 20), command=lambda: self.colour_code("#fff")).pack(side=LEFT)
-        b5 = Button(self.frame2, text="\t", bg="yellow", font=("Times", 20), command=lambda: self.colour_code("yellow")).pack(side=LEFT)
-        b6 = Button(self.frame2, text="\t", bg="green", font=("Times", 20), command=lambda: self.colour_code("green")).pack(side=LEFT)
+        elif self.D3['7'] == self.D3['8'] and self.D3['8'] != None and self.D3['9'] == None:
+            self.path = 9
+            self.gaming_mode(top)
+        elif self.D3['8'] == self.D3['9'] and self.D3['9'] != None and self.D3['7'] == None:
+            self.path = 7
+            self.gaming_mode(top)
+        elif self.D3['7'] == self.D3['9'] and self.D3['9'] != None and self.D3['8'] == None:
+            self.path = 8
+            self.gaming_mode(top)
+        else:
+            self.gaming_mode(top)
 
-        self.frame3 = Frame(self.root)
-        self.frame3.pack()
-        b7 = Button(self.frame3, text="\t", bg="brown", font=("Times", 20), command=lambda: self.colour_code("brown")).pack(side=LEFT)
-        b8 = Button(self.frame3, text="\t", bg="#6F1E51", font=("Times", 20), command=lambda: self.colour_code("#6F1E51")).pack(side=LEFT)
-        b9 = Button(self.frame3, text="\t", bg="#9980FA", font=("Times", 20), command=lambda: self.colour_code("#9980FA")).pack(side=LEFT)
-
-        self.frame4 = Frame(self.root)
-        self.frame4.pack()
-        b10 = Button(self.frame4, text="\t", bg="#16a085", font=("Times", 20), command=lambda: self.colour_code("#16a085")).pack(side=LEFT)
-        b11 = Button(self.frame4, text="\t", bg="#e67e22", font=("Times", 20), command=lambda: self.colour_code("#e67e22")).pack(side=LEFT)
-        b12 = Button(self.frame4, text="\t", bg="#c0392b", font=("Times", 20), command=lambda: self.colour_code("#c0392b")).pack(side=LEFT)
-
-        self.frame5 = Frame(self.root)
-        self.frame5.pack()
-        b13 = Button(self.frame5, text="\t", bg="#9b59b6", font=("Times", 20), command=lambda: self.colour_code("#9b59b6")).pack(side=LEFT)
-        b14 = Button(self.frame5, text="\t", bg="#1B1464", font=("Times", 20), command=lambda: self.colour_code("#1B1464")).pack(side=LEFT)
-        b15 = Button(self.frame5, text="\t", bg="black", font=("Times", 20), command=lambda: self.colour_code("black")).pack(side=LEFT)
-
-        self.frame6 = Frame(self.root)
-        self.frame6.pack()
-        b16 = Button(self.frame6, text="\t", bg="#7f8c8d", font=("Times", 20), command=lambda: self.colour_code("#7f8c8d")).pack(side=LEFT)
-        b17 = Button(self.frame6, text="\t", bg="#fdcb6e", font=("Times", 20), command=lambda: self.colour_code("#fdcb6e")).pack(side=LEFT)
-        b18 = Button(self.frame6, text="\t", bg="#81ecec", font=("Times", 20), command=lambda: self.colour_code("#81ecec")).pack(side=LEFT)
-
-        self.frame7 = Frame(self.root)
-        self.frame7.pack()
-        b19 = Button(self.frame7, text="\t", bg="#006266", font=("Times", 20), command=lambda: self.colour_code("#006266")).pack(side=LEFT)
-        b20 = Button(self.frame7, text="\t", bg="#D980FA", font=("Times", 20), command=lambda: self.colour_code("#D980FA")).pack(side=LEFT)
-        b21 = Button(self.frame7, text="\t", bg="#A3CB38", font=("Times", 20), command=lambda: self.colour_code("#A3CB38")).pack(side=LEFT)
-
-        b22 = Button(self.root, text="Back to game", font=("Times", 20), command=lambda: self.load_new_gui(self.gaming_window, self.background_colour_code)).pack()
-
-    def gaming_window(self, bgc=background_colour_code, top=1):
-        self.header_menu1(bgc)
-
-        self.frame1 = Frame(self.root)
-        self.frame1.pack()
-        l1 = Label(self.frame1, text=self.D2['Player_1']['Name'] + " - " + str(self.D2['Player_1']['Total_win']), fg=self.D2['Player_1']['Colour'], font=("Times", 17)).pack(side=LEFT)
-
+    def turn_of_cpu(self, top):
+        b = random.randint(1, 9)
+        while(self.D1[str(b)] != None):
+            b = random.randint(1, 9)
         if top == 1:
-            if bgc == self.D2['Player_1']['Colour']:
-                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_1']['Name'] + " ", bg=bgc, fg="#fff", font=("Times", 20)).pack(side=LEFT)
-            else:
-                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_1']['Name'] + " ", bg=bgc, fg=self.D2['Player_1']['Colour'], font=("Times", 20)).pack(side=LEFT)
             top = 2
         else:
-            if bgc == self.D2['Player_2']['Colour']:
-                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_2']['Name'] + " ", bg=bgc, fg="#fff", font=("Times", 20)).pack(side=LEFT)
-            else:
-                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_2']['Name'] + " ", bg=bgc, fg=self.D2['Player_2']['Colour'], font=("Times", 20)).pack(side=LEFT)
             top = 1
+        self.gaming_rule(top, b)
 
-        l3 = Label(self.frame1, text=self.D2['Player_2']['Name'] + " - " + str(self.D2['Player_2']['Total_win']), fg=self.D2['Player_2']['Colour'], font=("Times", 17)).pack(side=LEFT)
-
-        self.frame2 = Frame(self.root)
-        self.frame2.pack()
-        if self.D1['1'] == None:
-            b1 = Button(self.frame2, text="", font=("Times", 32), height=2, width=5, command=lambda: self.gaming_rule(1, top)).pack(side=LEFT)
-        else:
-            b1 = Button(self.frame2, text=self.D1['1'], fg=self.D0['1'], height=2, width=5, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['2'] == None:
-            b2 = Button(self.frame2, text="", height=2, width=5, font=("Times", 32), command=lambda: self.gaming_rule(2, top)).pack(side=LEFT)
-        else:
-            b2 = Button(self.frame2, text=self.D1['2'], height=2, width=5, fg=self.D0['2'], font=("Times", 32)).pack(side=LEFT)
-        if self.D1['3'] == None:
-            b3 = Button(self.frame2, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(3, top)).pack(side=LEFT)
-        else:
-            b3 = Button(self.frame2, text=self.D1['3'], width=5, height=2, fg=self.D0['3'], font=("Times", 32)).pack(side=LEFT)
-
-        self.frame3 = Frame(self.root)
-        self.frame3.pack()
-        if self.D1['4'] == None:
-            b4 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(4, top)).pack(side=LEFT)
-        else:
-            b4 = Button(self.frame3, text=self.D1['4'], width=5, fg=self.D0['4'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['5'] == None:
-            b5 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(5, top)).pack(side=LEFT)
-        else:
-            b5 = Button(self.frame3, text=self.D1['5'], width=5, fg=self.D0['5'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['6'] == None:
-            b6 = Button(self.frame3, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(6, top)).pack(side=LEFT)
-        else:
-            b6 = Button(self.frame3, text=self.D1['6'], width=5, height=2, fg=self.D0['6'], font=("Times", 32)).pack(side=LEFT)
-
-        self.frame4 = Frame(self.root)
-        self.frame4.pack()
-        if self.D1['7'] == None:
-            b7 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2,  command=lambda: self.gaming_rule(7, top)).pack(side=LEFT)
-        else:
-            b7 = Button(self.frame4, text=self.D1['7'], width=5, fg=self.D0['7'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['8'] == None:
-            b8 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(8, top)).pack(side=LEFT)
-        else:
-            b8 = Button(self.frame4, text=self.D1['8'], height=2, width=5, fg=self.D0['8'], font=("Times", 32)).pack(side=LEFT)
-        if self.D1['9'] == None:
-            b9 = Button(self.frame4, text="", height=2,  width=5, font=("Times", 32), command=lambda: self.gaming_rule(9, top)).pack(side=LEFT)
-        else:
-            b9 = Button(self.frame4, text=self.D1['9'], height=2, width=5, fg=self.D0['9'], font=("Times", 32)).pack(side=LEFT)
-
-    def gaming_rule(self, kyw=None, top=2):
+    def gaming_rule(self, top, kyw=None, ):
         if top == 2:
             symbol = self.D2['Player_1']['Symbol']
             colour = self.D2['Player_1']['Colour']
@@ -335,8 +323,11 @@ class Game:
         elif self.draw == 8:
             self.wining_function(0)
         else:
-            self.draw +=1
-            self.load_new_gui(self.gaming_window, self.background_colour_code, top)
+            self.draw += 1
+            if self.path == 11:
+                self.intelligence_of_cup(top)
+            else:
+                self.gaming_mode(top)
 
     def wining_function(self, w_id):
         self.p_id = w_id
@@ -348,6 +339,233 @@ class Game:
             self.D2['Player_1']['Total_win'] += 0
             self.D2['Player_2']['Total_win'] += 0
         self.load_new_gui(self.wining_gui_window)
+
+    def colour_code_change(self, cc=None):
+        self.background_colour_code = cc
+        self.load_new_gui(self.load_2nd_window)
+
+    def load_1st_window(self):
+        def show():
+            m1 = mode1.get()
+            m2 = mode2.get()
+            if m1 == "Single Player":
+                self.mode = m1
+                self.load_new_gui(self.load_1st_window, self.background_colour_code)
+            elif m1 == "Two Player":
+                self.mode = m1
+                self.load_new_gui(self.load_2nd_window, self.background_colour_code)
+            elif m2 == "First Turn" or m2 == "Second Turn":
+                self.turn = m2
+                self.load_new_gui(self.load_2nd_window)
+            else:
+                messagebox.showerror("Error", "Please select the option")
+        if self.mode == "Single Player":
+            self.header_menu2()
+        if self.background_colour_code == "#fff":
+            fc = "black"
+        else:
+            fc = "#fff"
+        if self.background_colour_code == self.D2['Player_1']['Colour'] or self.background_colour_code == self.D2['Player_2']['Colour']:
+            tc = "#fff"
+        else:
+            tc = self.background_colour_code
+        self.label0 = Label(self.root, text="Tic Tac Toe", bg=self.background_colour_code, fg=fc, font=("Times", 32, "bold")).pack(pady=(20, 10))
+
+        # Dropdown menu options
+        options1 = ["Single Player", "Two Player"]
+        mode1 = StringVar()
+        mode1.set("Select the Mode")
+
+        # Dropdown menu options
+        options2 = ["First Turn", "Second Turn"]
+        mode2 = StringVar()
+        mode2.set("Select the Turn")
+
+        # Create Dropdown menu
+        self.frame1 = Frame(self.root, bg="#3498db")
+        self.frame1.pack(pady=(30, 10))
+        if self.mode == None:
+            drop = OptionMenu(self.frame1, mode1, *options1)
+            drop.configure(font=("Times", 20, "italic"))
+            drop.pack()
+            drop['width'] = 15
+        else:
+            self.label1 = Label(self.frame1, text=self.mode + " Mode", bg=self.background_colour_code, fg=fc, font=("Times", 20, "italic")).pack(side=LEFT)
+
+        # Create Dropdown menu
+        self.frame2 = Frame(self.root, bg="#3498db")
+        self.frame2.pack(pady=(30, 10))
+        if self.mode == "Single Player":
+            drop = OptionMenu(self.frame2, mode2, *options2)
+            drop.configure(font=("Times", 20, "italic"))
+            drop.pack()
+            drop['width'] = 15
+
+        self.next_btn = Button(self.root, text="Next", bg="#fff", fg="#FF5357", font=("Times", 20, "bold"), command=show).pack(side=BOTTOM, pady=(10, 25))
+
+    def load_2nd_window(self):
+        self.header_menu3()
+
+        if self.background_colour_code == "#fff":
+            fc = "black"
+        else:
+            fc = "#fff"
+        if self.background_colour_code == self.D2['Player_1']['Colour'] or self.background_colour_code == self.D2['Player_2']['Colour']:
+            tc = "#fff"
+        else:
+            tc = self.background_colour_code
+        self.label0 = Label(self.root, text="Tic Tac Toe", bg=self.background_colour_code, fg=fc, font=("Times", 32, "bold")).pack(pady=(20, 10))
+        self.label1 = Label(self.root, text="First Player", bg=self.background_colour_code, fg=fc, font=("Times", 20, "italic")).pack(pady=(10, 2))
+
+        v1 = StringVar()
+        if self.turn == "Second Turn":
+            v1.set("CPU")
+        else:
+            v1.set(self.D2['Player_1']['Name'])
+        self.player_1 = Entry(self.root, textvariable=v1)
+        self.player_1.pack(pady=(2, 10), ipady=7, ipadx=80)
+
+        self.frame1 = Frame(self.root, bg="#3498db")
+        self.frame1.pack()
+        self.label2 = Label(self.frame1, text=self.D2['Player_1']['Symbol'], bg=tc, fg=self.D2['Player_1']['Colour'],  font=("Arial", 20)).pack(side=LEFT)
+        self.sim1 = Button(self.frame1, text="Change symbol & colour", bg="#fff", fg="#FF5357", font=("Times", 14), command=lambda: self.load_new_gui(new_gui=self.symbol_change_gui, btn=1)).pack(side=LEFT)
+
+        self.label3 = Label(self.root, text="Second Player", bg=self.background_colour_code, fg=fc, font=("Times", 20, "italic")).pack(pady=(20, 2))
+
+        v2 = StringVar()
+        if self.turn == "First Turn":
+            v2.set("CPU")
+        else:
+            v2.set(self.D2['Player_2']['Name'])
+        self.player_2 = Entry(self.root, textvariable=v2)
+        self.player_2.pack(pady=(2, 10), ipady=7, ipadx=80)
+
+        self.frame2 = Frame(self.root, bg="#3498db")
+        self.frame2.pack()
+        self.label4 = Label(self.frame2, text=self.D2['Player_2']['Symbol'], fg=self.D2['Player_2']['Colour'], bg=tc, font=("Arial", 20)).pack(side=LEFT)
+        self.sim2 = Button(self.frame2, text="Change symbol & colour", bg="#fff", fg="#FF5357", font=("Times", 14), command=lambda: self.load_new_gui(new_gui=self.symbol_change_gui, btn=2)).pack(side=LEFT)
+
+        self.start_btn = Button(self.root, text="Start Game", bg="#fff", fg="#FF5357", font=("Times", 20, "bold"), command=lambda: self.player_details()).pack(pady=(10, 10))
+
+    def colour_code(self, code):
+        self.code = code
+
+    def background_colour_change(self):
+        self.header_menu2()
+
+        self.label0 = Label(self.root, text="Press the  Colour which you want", font=("Times", 20, "bold")).pack(pady=(20, 10))
+
+        self.frame1 = Frame(self.root)
+        self.frame1.pack()
+        b1 = Button(self.frame1, text="\t", bg="#3498db", font=("Times", 20), command=lambda: self.colour_code("#3498db")).pack(side=LEFT)
+        b2 = Button(self.frame1, text="\t", bg="red", font=("Times", 20), command=lambda: self.colour_code("red")).pack(side=LEFT)
+        b3 = Button(self.frame1, text="\t", bg="blue", font=("Times", 20), command=lambda: self.colour_code("blue")).pack(side=LEFT)
+
+        self.frame2 = Frame(self.root)
+        self.frame2.pack()
+        b4 = Button(self.frame2, text="\t", bg="#fff", font=("Times", 20), command=lambda: self.colour_code("#fff")).pack(side=LEFT)
+        b5 = Button(self.frame2, text="\t", bg="yellow", font=("Times", 20), command=lambda: self.colour_code("yellow")).pack(side=LEFT)
+        b6 = Button(self.frame2, text="\t", bg="green", font=("Times", 20), command=lambda: self.colour_code("green")).pack(side=LEFT)
+
+        self.frame3 = Frame(self.root)
+        self.frame3.pack()
+        b7 = Button(self.frame3, text="\t", bg="brown", font=("Times", 20), command=lambda: self.colour_code("brown")).pack(side=LEFT)
+        b8 = Button(self.frame3, text="\t", bg="#6F1E51", font=("Times", 20), command=lambda: self.colour_code("#6F1E51")).pack(side=LEFT)
+        b9 = Button(self.frame3, text="\t", bg="#9980FA", font=("Times", 20), command=lambda: self.colour_code("#9980FA")).pack(side=LEFT)
+
+        self.frame4 = Frame(self.root)
+        self.frame4.pack()
+        b10 = Button(self.frame4, text="\t", bg="#16a085", font=("Times", 20), command=lambda: self.colour_code("#16a085")).pack(side=LEFT)
+        b11 = Button(self.frame4, text="\t", bg="#e67e22", font=("Times", 20), command=lambda: self.colour_code("#e67e22")).pack(side=LEFT)
+        b12 = Button(self.frame4, text="\t", bg="#c0392b", font=("Times", 20), command=lambda: self.colour_code("#c0392b")).pack(side=LEFT)
+
+        self.frame5 = Frame(self.root)
+        self.frame5.pack()
+        b13 = Button(self.frame5, text="\t", bg="#9b59b6", font=("Times", 20), command=lambda: self.colour_code("#9b59b6")).pack(side=LEFT)
+        b14 = Button(self.frame5, text="\t", bg="#1B1464", font=("Times", 20), command=lambda: self.colour_code("#1B1464")).pack(side=LEFT)
+        b15 = Button(self.frame5, text="\t", bg="black", font=("Times", 20), command=lambda: self.colour_code("black")).pack(side=LEFT)
+
+        self.frame6 = Frame(self.root)
+        self.frame6.pack()
+        b16 = Button(self.frame6, text="\t", bg="#7f8c8d", font=("Times", 20), command=lambda: self.colour_code("#7f8c8d")).pack(side=LEFT)
+        b17 = Button(self.frame6, text="\t", bg="#fdcb6e", font=("Times", 20), command=lambda: self.colour_code("#fdcb6e")).pack(side=LEFT)
+        b18 = Button(self.frame6, text="\t", bg="#81ecec", font=("Times", 20), command=lambda: self.colour_code("#81ecec")).pack(side=LEFT)
+
+        self.frame7 = Frame(self.root)
+        self.frame7.pack()
+        b19 = Button(self.frame7, text="\t", bg="#006266", font=("Times", 20), command=lambda: self.colour_code("#006266")).pack(side=LEFT)
+        b20 = Button(self.frame7, text="\t", bg="#D980FA", font=("Times", 20), command=lambda: self.colour_code("#D980FA")).pack(side=LEFT)
+        b21 = Button(self.frame7, text="\t", bg="#A3CB38", font=("Times", 20), command=lambda: self.colour_code("#A3CB38")).pack(side=LEFT)
+
+        b22 = Button(self.root, text="OK", font=("Times", 20), command=lambda: self.colour_code_change(self.code)).pack()
+
+    def gaming_window(self, top=1):
+        bgc = self.background_colour_code
+        self.header_menu1()
+
+        self.frame1 = Frame(self.root)
+        self.frame1.pack()
+        l1 = Label(self.frame1, text=self.D2['Player_1']['Name'] + " - " + str(self.D2['Player_1']['Total_win']), fg=self.D2['Player_1']['Colour'], font=("Times", 17)).pack(side=LEFT)
+
+        if top == 1:
+            if bgc == self.D2['Player_1']['Colour']:
+                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_1']['Name'] + " ", bg=bgc, fg="#fff", font=("Times", 20)).pack(side=LEFT)
+            else:
+                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_1']['Name'] + " ", bg=bgc, fg=self.D2['Player_1']['Colour'], font=("Times", 20)).pack(side=LEFT)
+            top = 2
+        else:
+            if bgc == self.D2['Player_2']['Colour']:
+                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_2']['Name'] + " ", bg=bgc, fg="#fff", font=("Times", 20)).pack(side=LEFT)
+            else:
+                l2 = Label(self.frame1, text=" Turn of " + self.D2['Player_2']['Name'] + " ", bg=bgc, fg=self.D2['Player_2']['Colour'], font=("Times", 20)).pack(side=LEFT)
+            top = 1
+
+        l3 = Label(self.frame1, text=self.D2['Player_2']['Name'] + " - " + str(self.D2['Player_2']['Total_win']), fg=self.D2['Player_2']['Colour'], font=("Times", 17)).pack(side=LEFT)
+
+        self.frame2 = Frame(self.root)
+        self.frame2.pack()
+        if self.D1['1'] == None:
+            b1 = Button(self.frame2, text="", font=("Times", 32), height=2, width=5, command=lambda: self.gaming_rule(top, 1)).pack(side=LEFT)
+        else:
+            b1 = Button(self.frame2, text=self.D1['1'], fg=self.D0['1'], height=2, width=5, font=("Times", 32)).pack(side=LEFT)
+        if self.D1['2'] == None:
+            b2 = Button(self.frame2, text="", height=2, width=5, font=("Times", 32), command=lambda: self.gaming_rule(top, 2)).pack(side=LEFT)
+        else:
+            b2 = Button(self.frame2, text=self.D1['2'], height=2, width=5, fg=self.D0['2'], font=("Times", 32)).pack(side=LEFT)
+        if self.D1['3'] == None:
+            b3 = Button(self.frame2, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(top, 3)).pack(side=LEFT)
+        else:
+            b3 = Button(self.frame2, text=self.D1['3'], width=5, height=2, fg=self.D0['3'], font=("Times", 32)).pack(side=LEFT)
+
+        self.frame3 = Frame(self.root)
+        self.frame3.pack()
+        if self.D1['4'] == None:
+            b4 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 4)).pack(side=LEFT)
+        else:
+            b4 = Button(self.frame3, text=self.D1['4'], width=5, fg=self.D0['4'], height=2, font=("Times", 32)).pack(side=LEFT)
+        if self.D1['5'] == None:
+            b5 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 5)).pack(side=LEFT)
+        else:
+            b5 = Button(self.frame3, text=self.D1['5'], width=5, fg=self.D0['5'], height=2, font=("Times", 32)).pack(side=LEFT)
+        if self.D1['6'] == None:
+            b6 = Button(self.frame3, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(top, 6)).pack(side=LEFT)
+        else:
+            b6 = Button(self.frame3, text=self.D1['6'], width=5, height=2, fg=self.D0['6'], font=("Times", 32)).pack(side=LEFT)
+
+        self.frame4 = Frame(self.root)
+        self.frame4.pack()
+        if self.D1['7'] == None:
+            b7 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2,  command=lambda: self.gaming_rule(top, 7)).pack(side=LEFT)
+        else:
+            b7 = Button(self.frame4, text=self.D1['7'], width=5, fg=self.D0['7'], height=2, font=("Times", 32)).pack(side=LEFT)
+        if self.D1['8'] == None:
+            b8 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 8)).pack(side=LEFT)
+        else:
+            b8 = Button(self.frame4, text=self.D1['8'], height=2, width=5, fg=self.D0['8'], font=("Times", 32)).pack(side=LEFT)
+        if self.D1['9'] == None:
+            b9 = Button(self.frame4, text="", height=2,  width=5, font=("Times", 32), command=lambda: self.gaming_rule(top, 9)).pack(side=LEFT)
+        else:
+            b9 = Button(self.frame4, text=self.D1['9'], height=2, width=5, fg=self.D0['9'], font=("Times", 32)).pack(side=LEFT)
 
     def wining_gui_window(self):
         if self.highlight_text == 1:
@@ -442,9 +660,9 @@ class Game:
         else:
             data = messagebox.askyesno("Congrats!", "Match draw. Are you want to play again?")
         if data == True:
-            self.refresh_gaming_window(self.background_colour_code, self.gaming_window, "True")
+            self.refresh_window(self.background_colour_code, self.gaming_window, "TRUE")
         else:
-            self.refresh_gaming_window(self.background_colour_code, self.load_1st_window, "False")
+            self.refresh_window(self.background_colour_code, self.load_1st_window, "FALSE")
 
     def symbol_change(self, sym, btn):
         if btn == 1:
@@ -459,7 +677,7 @@ class Game:
             self.D2['Player_2']['Colour'] = colour
 
     def symbol_change_gui(self, btn):
-        self.header_menu3()
+        self.header_menu2()
 
         self.label0 = Label(self.root, text="Press the symbol which you want", font=("Times", 20, "bold")).pack(pady=(20, 10))
 
@@ -541,7 +759,7 @@ class Game:
         b220 = Button(self.root, text="Colour change", fg="#FF5357", font=("Times", 20), command=lambda: self.load_new_gui(new_gui=self.symbol_colour_change_gui, btn=btn)).pack()
 
     def symbol_colour_change_gui(self, btn):
-        self.header_menu4()
+        self.header_menu2()
 
         self.label0 = Label(self.root, text="Press the  Colour which you want", font=("Times", 20, "bold")).pack(pady=(20, 10))
 
@@ -587,7 +805,7 @@ class Game:
         b20 = Button(self.frame7, text="\t", bg="#D980FA", font=("Times", 20), command=lambda: self.symbol_colour_change("#D980FA", btn)).pack(side=LEFT)
         b21 = Button(self.frame7, text="\t", bg="#FF5357", font=("Times", 20), command=lambda: self.symbol_colour_change("#FF5357", btn)).pack(side=LEFT)
 
-        b22 = Button(self.root, text="OK", fg="#FF5357", font=("Times", 20), command=lambda: self.load_new_gui(self.load_1st_window, self.background_colour_code)).pack()
+        b22 = Button(self.root, text="OK", fg="#FF5357", font=("Times", 20), command=lambda: self.load_new_gui(self.load_2nd_window, self.background_colour_code)).pack()
 
 
 Game()
