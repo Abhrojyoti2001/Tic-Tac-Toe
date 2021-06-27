@@ -1,2 +1,2 @@
 # Tic-Tac-Toe
-Two mode are available (Single player & Two player)
+Two modes are available (Single player & Two player)
