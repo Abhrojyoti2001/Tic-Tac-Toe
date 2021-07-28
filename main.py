@@ -28,7 +28,7 @@ class Game:
         self.root.minsize(420, 500)
         self.root.maxsize(420, 500)
 
-        if bgc == None:
+        if bgc is None:
             self.root.configure(background=self.background_colour_code)
         else:
             self.root.configure(background=bgc)
@@ -57,7 +57,7 @@ class Game:
         else:
             self.load_gui_window(new_gui, top=top)
 
-    def refresh_window(self, bgc, new_window, kyw=None):
+    def refresh_window(self, new_window, kyw=None):
         self.D0 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
         self.D1 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
         self.D3 = {'1': None, '2': None, '3': None, '4': None, '5': None, '6': None, '7': None, '8': None, '9': None}
@@ -84,22 +84,22 @@ class Game:
     def header_menu1(self):
         menu = Menu(self.root)
         self.root.configure(menu=menu)
-        filemenu = Menu(menu)
-        menu.add_cascade(label="Home", menu=filemenu)
-        filemenu.add_command(label="Restart This Game", command=lambda: self.refresh_window(self.background_colour_code, self.gaming_window, "RTG"))
-        filemenu.add_command(label="Start a New Game", command=lambda: self.refresh_window(self.background_colour_code, self.gaming_window, "SNG"))
-        filemenu.add_command(label="Exit and Back to First Page", command=lambda: self.refresh_window(self.background_colour_code, self.load_1st_window, "EBFP"))
+        file_menu = Menu(menu)
+        menu.add_cascade(label="Home", menu=file_menu)
+        file_menu.add_command(label="Restart This Game", command=lambda: self.refresh_window(self.gaming_window, "RTG"))
+        file_menu.add_command(label="Start a New Game", command=lambda: self.refresh_window(self.gaming_window, "SNG"))
+        file_menu.add_command(label="Exit and Back to First Page", command=lambda: self.refresh_window(self.load_1st_window, "EBFP"))
 
     def header_menu2(self):
         menu = Menu(self.root)
         self.root.configure(menu=menu)
-        filemenu = Menu(menu)
+        file_menu = Menu(menu)
         menu.add_command(label="Back", command=lambda: self.back_button_task())
 
     def header_menu3(self):
         menu = Menu(self.root)
         self.root.configure(menu=menu)
-        filemenu = Menu(menu)
+        file_menu = Menu(menu)
         menu.add_command(label="Back", command=lambda: self.back_button_task())
         menu.add_command(label="Change Background Colour", command=lambda: self.load_new_gui(self.background_colour_change))
 
@@ -132,7 +132,7 @@ class Game:
 
     def gaming_mode(self, top):
         if self.mode == "Single Player":
-            if self.path == 0: # this is for first time
+            if self.path == 0:  # this is for first time
                 if self.turn == "First Turn":
                     self.path = 11
                     self.load_new_gui(self.gaming_window, top)
@@ -157,83 +157,83 @@ class Game:
             self.load_new_gui(self.gaming_window, top)
 
     def intelligence_of_cup(self, top):
-        if self.D3['1'] == self.D3['2'] and self.D3['2'] != None and self.D3['3'] == None:
+        if self.D3['1'] == self.D3['2'] and self.D3['2'] is not None and self.D3['3'] is None:
             self.path = 3
             self.gaming_mode(top)
-        elif self.D3['2'] == self.D3['3'] and self.D3['3'] != None and self.D3['1'] == None:
+        elif self.D3['2'] == self.D3['3'] and self.D3['3'] is not None and self.D3['1'] is None:
             self.path = 1
             self.gaming_mode(top)
-        elif self.D3['1'] == self.D3['3'] and self.D3['3'] != None and self.D3['2'] == None:
+        elif self.D3['1'] == self.D3['3'] and self.D3['3'] is not None and self.D3['2'] is None:
             self.path = 2
             self.gaming_mode(top)
 
-        elif self.D3['1'] == self.D3['4'] and self.D3['4'] != None and self.D3['7'] == None:
+        elif self.D3['1'] == self.D3['4'] and self.D3['4'] is not None and self.D3['7'] is None:
             self.path = 7
             self.gaming_mode(top)
-        elif self.D3['4'] == self.D3['7'] and self.D3['7'] != None and self.D3['1'] == None:
+        elif self.D3['4'] == self.D3['7'] and self.D3['7'] is not None and self.D3['1'] is None:
             self.path = 1
             self.gaming_mode(top)
-        elif self.D3['1'] == self.D3['7'] and self.D3['7'] != None and self.D3['4'] == None:
+        elif self.D3['1'] == self.D3['7'] and self.D3['7'] is not None and self.D3['4'] is None:
             self.path = 4
             self.gaming_mode(top)
 
-        elif self.D3['1'] == self.D3['5'] and self.D3['5'] != None and self.D3['9'] == None:
+        elif self.D3['1'] == self.D3['5'] and self.D3['5'] is not None and self.D3['9'] is None:
             self.path = 9
             self.gaming_mode(top)
-        elif self.D3['5'] == self.D3['9'] and self.D3['9'] != None and self.D3['1'] == None:
+        elif self.D3['5'] == self.D3['9'] and self.D3['9'] is not None and self.D3['1'] is None:
             self.path = 1
             self.gaming_mode(top)
-        elif self.D3['1'] == self.D3['9'] and self.D3['9'] != None and self.D3['5'] == None:
+        elif self.D3['1'] == self.D3['9'] and self.D3['9'] is not None and self.D3['5'] is None:
             self.path = 5
             self.gaming_mode(top)
 
-        elif self.D3['2'] == self.D3['5'] and self.D3['5'] != None and self.D3['8'] == None:
+        elif self.D3['2'] == self.D3['5'] and self.D3['5'] is not None and self.D3['8'] is None:
             self.path = 8
             self.gaming_mode(top)
-        elif self.D3['5'] == self.D3['8'] and self.D3['8'] != None and self.D3['2'] == None:
+        elif self.D3['5'] == self.D3['8'] and self.D3['8'] is not None and self.D3['2'] is None:
             self.path = 2
             self.gaming_mode(top)
-        elif self.D3['2'] == self.D3['8'] and self.D3['8'] != None and self.D3['5'] == None:
+        elif self.D3['2'] == self.D3['8'] and self.D3['8'] is not None and self.D3['5'] is None:
             self.path = 5
             self.gaming_mode(top)
 
-        elif self.D3['3'] == self.D3['5'] and self.D3['5'] != None and self.D3['7'] == None:
+        elif self.D3['3'] == self.D3['5'] and self.D3['5'] is not None and self.D3['7'] is None:
             self.path = 7
             self.gaming_mode(top)
-        elif self.D3['5'] == self.D3['7'] and self.D3['7'] != None and self.D3['3'] == None:
+        elif self.D3['5'] == self.D3['7'] and self.D3['7'] is not None and self.D3['3'] is None:
             self.path = 3
             self.gaming_mode(top)
-        elif self.D3['3'] == self.D3['7'] and self.D3['7'] != None and self.D3['5'] == None:
+        elif self.D3['3'] == self.D3['7'] and self.D3['7'] is not None and self.D3['5'] is None:
             self.path = 5
             self.gaming_mode(top)
 
-        elif self.D3['3'] == self.D3['6'] and self.D3['6'] != None and self.D3['9'] == None:
+        elif self.D3['3'] == self.D3['6'] and self.D3['6'] is not None and self.D3['9'] is None:
             self.path = 9
             self.gaming_mode(top)
-        elif self.D3['6'] == self.D3['9'] and self.D3['9'] != None and self.D3['3'] == None:
+        elif self.D3['6'] == self.D3['9'] and self.D3['9'] is not None and self.D3['3'] is None:
             self.path = 3
             self.gaming_mode(top)
-        elif self.D3['3'] == self.D3['9'] and self.D3['9'] != None and self.D3['6'] == None:
+        elif self.D3['3'] == self.D3['9'] and self.D3['9'] is not None and self.D3['6'] is None:
             self.path = 6
             self.gaming_mode(top)
 
-        elif self.D3['4'] == self.D3['5'] and self.D3['5'] != None and self.D3['6'] == None:
+        elif self.D3['4'] == self.D3['5'] and self.D3['5'] is not None and self.D3['6'] is None:
             self.path = 6
             self.gaming_mode(top)
-        elif self.D3['5'] == self.D3['6'] and self.D3['6'] != None and self.D3['4'] == None:
+        elif self.D3['5'] == self.D3['6'] and self.D3['6'] is not None and self.D3['4'] is None:
             self.path = 4
             self.gaming_mode(top)
-        elif self.D3['4'] == self.D3['6'] and self.D3['6'] != None and self.D3['5'] == None:
+        elif self.D3['4'] == self.D3['6'] and self.D3['6'] is not None and self.D3['5'] is None:
             self.path = 5
             self.gaming_mode(top)
 
-        elif self.D3['7'] == self.D3['8'] and self.D3['8'] != None and self.D3['9'] == None:
+        elif self.D3['7'] == self.D3['8'] and self.D3['8'] is not None and self.D3['9'] is None:
             self.path = 9
             self.gaming_mode(top)
-        elif self.D3['8'] == self.D3['9'] and self.D3['9'] != None and self.D3['7'] == None:
+        elif self.D3['8'] == self.D3['9'] and self.D3['9'] is not None and self.D3['7'] is None:
             self.path = 7
             self.gaming_mode(top)
-        elif self.D3['7'] == self.D3['9'] and self.D3['9'] != None and self.D3['8'] == None:
+        elif self.D3['7'] == self.D3['9'] and self.D3['9'] is not None and self.D3['8'] is None:
             self.path = 8
             self.gaming_mode(top)
         else:
@@ -241,15 +241,15 @@ class Game:
 
     def turn_of_cpu(self, top):
         b = random.randint(1, 9)
-        while(self.D1[str(b)] != None):
-            b = random.randint(1, 9)
+        if self.D1[str(b)] is not None:
+            self.turn_of_cpu(top)
         if top == 1:
             top = 2
         else:
             top = 1
         self.gaming_rule(top, b)
 
-    def gaming_rule(self, top, kyw=None, ):
+    def gaming_rule(self, top, kyw=None):
         if top == 2:
             symbol = self.D2['Player_1']['Symbol']
             colour = self.D2['Player_1']['Colour']
@@ -296,28 +296,28 @@ class Game:
             self.D1['9'] = symbol
             self.D3['9'] = p_id
 
-        if self.D3['1'] == self.D3['2'] and self.D3['2'] == self.D3['3'] and self.D3['3'] != None:
+        if self.D3['1'] == self.D3['2'] and self.D3['2'] == self.D3['3'] and self.D3['3'] is not None:
             self.wining_function(self.D3['1'])
             self.highlight_text = 1
-        elif self.D3['1'] == self.D3['4'] and self.D3['4'] == self.D3['7'] and self.D3['7'] != None:
+        elif self.D3['1'] == self.D3['4'] and self.D3['4'] == self.D3['7'] and self.D3['7'] is not None:
             self.wining_function(self.D3['1'])
             self.highlight_text = 2
-        elif self.D3['1'] == self.D3['5'] and self.D3['5'] == self.D3['9'] and self.D3['9'] != None:
+        elif self.D3['1'] == self.D3['5'] and self.D3['5'] == self.D3['9'] and self.D3['9'] is not None:
             self.wining_function(self.D3['1'])
             self.highlight_text = 3
-        elif self.D3['2'] == self.D3['5'] and self.D3['5'] == self.D3['8'] and self.D3['8'] != None:
+        elif self.D3['2'] == self.D3['5'] and self.D3['5'] == self.D3['8'] and self.D3['8'] is not None:
             self.wining_function(self.D3['2'])
             self.highlight_text = 4
-        elif self.D3['3'] == self.D3['5'] and self.D3['5'] == self.D3['7'] and self.D3['7'] != None:
+        elif self.D3['3'] == self.D3['5'] and self.D3['5'] == self.D3['7'] and self.D3['7'] is not None:
             self.wining_function(self.D3['3'])
             self.highlight_text = 5
-        elif self.D3['3'] == self.D3['6'] and self.D3['6'] == self.D3['9'] and self.D3['9'] != None:
+        elif self.D3['3'] == self.D3['6'] and self.D3['6'] == self.D3['9'] and self.D3['9'] is not None:
             self.wining_function(self.D3['3'])
             self.highlight_text = 6
-        elif self.D3['4'] == self.D3['5'] and self.D3['5'] == self.D3['6'] and self.D3['6'] != None:
+        elif self.D3['4'] == self.D3['5'] and self.D3['5'] == self.D3['6'] and self.D3['6'] is not None:
             self.wining_function(self.D3['4'])
             self.highlight_text = 7
-        elif self.D3['7'] == self.D3['8'] and self.D3['8'] == self.D3['9'] and self.D3['9'] != None:
+        elif self.D3['7'] == self.D3['8'] and self.D3['8'] == self.D3['9'] and self.D3['9'] is not None:
             self.wining_function(self.D3['7'])
             self.highlight_text = 8
         elif self.draw == 8:
@@ -365,10 +365,6 @@ class Game:
             fc = "black"
         else:
             fc = "#fff"
-        if self.background_colour_code == self.D2['Player_1']['Colour'] or self.background_colour_code == self.D2['Player_2']['Colour']:
-            tc = "#fff"
-        else:
-            tc = self.background_colour_code
         self.label0 = Label(self.root, text="Tic Tac Toe", bg=self.background_colour_code, fg=fc, font=("Times", 32, "bold")).pack(pady=(20, 10))
 
         # Dropdown menu options
@@ -384,7 +380,7 @@ class Game:
         # Create Dropdown menu
         self.frame1 = Frame(self.root, bg="#3498db")
         self.frame1.pack(pady=(30, 10))
-        if self.mode == None:
+        if self.mode is None:
             drop = OptionMenu(self.frame1, mode1, *options1)
             drop.configure(font=("Times", 20, "italic"))
             drop.pack()
@@ -524,45 +520,45 @@ class Game:
 
         self.frame2 = Frame(self.root)
         self.frame2.pack()
-        if self.D1['1'] == None:
+        if self.D1['1'] is None:
             b1 = Button(self.frame2, text="", font=("Times", 32), height=2, width=5, command=lambda: self.gaming_rule(top, 1)).pack(side=LEFT)
         else:
             b1 = Button(self.frame2, text=self.D1['1'], fg=self.D0['1'], height=2, width=5, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['2'] == None:
+        if self.D1['2'] is None:
             b2 = Button(self.frame2, text="", height=2, width=5, font=("Times", 32), command=lambda: self.gaming_rule(top, 2)).pack(side=LEFT)
         else:
             b2 = Button(self.frame2, text=self.D1['2'], height=2, width=5, fg=self.D0['2'], font=("Times", 32)).pack(side=LEFT)
-        if self.D1['3'] == None:
+        if self.D1['3'] is None:
             b3 = Button(self.frame2, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(top, 3)).pack(side=LEFT)
         else:
             b3 = Button(self.frame2, text=self.D1['3'], width=5, height=2, fg=self.D0['3'], font=("Times", 32)).pack(side=LEFT)
 
         self.frame3 = Frame(self.root)
         self.frame3.pack()
-        if self.D1['4'] == None:
+        if self.D1['4'] is None:
             b4 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 4)).pack(side=LEFT)
         else:
             b4 = Button(self.frame3, text=self.D1['4'], width=5, fg=self.D0['4'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['5'] == None:
+        if self.D1['5'] is None:
             b5 = Button(self.frame3, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 5)).pack(side=LEFT)
         else:
             b5 = Button(self.frame3, text=self.D1['5'], width=5, fg=self.D0['5'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['6'] == None:
+        if self.D1['6'] is None:
             b6 = Button(self.frame3, text="", width=5, height=2, font=("Times", 32), command=lambda: self.gaming_rule(top, 6)).pack(side=LEFT)
         else:
             b6 = Button(self.frame3, text=self.D1['6'], width=5, height=2, fg=self.D0['6'], font=("Times", 32)).pack(side=LEFT)
 
         self.frame4 = Frame(self.root)
         self.frame4.pack()
-        if self.D1['7'] == None:
+        if self.D1['7'] is None:
             b7 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2,  command=lambda: self.gaming_rule(top, 7)).pack(side=LEFT)
         else:
             b7 = Button(self.frame4, text=self.D1['7'], width=5, fg=self.D0['7'], height=2, font=("Times", 32)).pack(side=LEFT)
-        if self.D1['8'] == None:
+        if self.D1['8'] is None:
             b8 = Button(self.frame4, text="", width=5, font=("Times", 32), height=2, command=lambda: self.gaming_rule(top, 8)).pack(side=LEFT)
         else:
             b8 = Button(self.frame4, text=self.D1['8'], height=2, width=5, fg=self.D0['8'], font=("Times", 32)).pack(side=LEFT)
-        if self.D1['9'] == None:
+        if self.D1['9'] is None:
             b9 = Button(self.frame4, text="", height=2,  width=5, font=("Times", 32), command=lambda: self.gaming_rule(top, 9)).pack(side=LEFT)
         else:
             b9 = Button(self.frame4, text=self.D1['9'], height=2, width=5, fg=self.D0['9'], font=("Times", 32)).pack(side=LEFT)
@@ -600,8 +596,7 @@ class Game:
             self.D4['7'] = 1
             self.D4['8'] = 1
             self.D4['9'] = 1
-        else:
-            f = 1
+
         self.frame1 = Frame(self.root)
         self.frame1.pack()
         l1 = Label(self.frame1, text=self.D2['Player_1']['Name'] + " - " + str(self.D2['Player_1']['Total_win']), fg=self.D2['Player_1']['Colour'], font=("Times", 17)).pack(side=LEFT)
@@ -659,10 +654,10 @@ class Game:
             data = messagebox.askyesno("Congrats!", self.D2['Player_2']['Name'] + " Win. Are you want to play again?")
         else:
             data = messagebox.askyesno("Congrats!", "Match draw. Are you want to play again?")
-        if data == True:
-            self.refresh_window(self.background_colour_code, self.gaming_window, "TRUE")
+        if data is True:
+            self.refresh_window(self.gaming_window, "TRUE")
         else:
-            self.refresh_window(self.background_colour_code, self.load_1st_window, "FALSE")
+            self.refresh_window(self.load_1st_window, "FALSE")
 
     def symbol_change(self, sym, btn):
         if btn == 1:
@@ -756,7 +751,7 @@ class Game:
         self.frame7 = Frame(self.root)
         self.frame7.pack()
 
-        b220 = Button(self.root, text="Colour change", fg="#FF5357", font=("Times", 20), command=lambda: self.load_new_gui(new_gui=self.symbol_colour_change_gui, btn=btn)).pack()
+        b54 = Button(self.root, text="Colour change", fg="#FF5357", font=("Times", 20), command=lambda: self.load_new_gui(new_gui=self.symbol_colour_change_gui, btn=btn)).pack()
 
     def symbol_colour_change_gui(self, btn):
         self.header_menu2()
